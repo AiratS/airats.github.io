@@ -123,28 +123,30 @@
     $camera.addClass('hidden');
     $loading.removeClass('hidden');
 
-    navigator.geolocation.getCurrentPosition((position) => {
-      let lat = position.coords.latitude;
-      let long = position.coords.longitude;
+    setTimeout(() => {
+      $.get('http://1142359-cr95104.tw1.ru/api/find-place', {
+        latitude: 12,
+        longitude: 12,
+      }).done((response) => {
+        $('.review__name').text(response.name);
+        $('.review__rating-value').text(response.rating);
+        $('.review__text-value').text(response.name);
+        $('.review__image').attr('src', response.img);
 
-      setTimeout(() => {
-        $.get('http://1142359-cr95104.tw1.ru/api/find-place', {
-          latitude: lat,
-          longitude: long,
-        }).done((response) => {
-          $('.review__name').text(response.name);
-          $('.review__rating-value').text(response.rating);
-          $('.review__text-value').text(response.name);
-          $('.review__image').attr('src', response.img);
+        $loading.addClass('hidden');
+        $review.removeClass('hidden');
+      }).fail(() => {
+        $loading.addClass('hidden');
+        $notFound.removeClass('hidden')
+      });
+    }, 2000)
 
-          $loading.addClass('hidden');
-          $review.removeClass('hidden');
-        }).fail(() => {
-          $loading.addClass('hidden');
-          $notFound.removeClass('hidden')
-        });
-      }, 2000)
-    });
+    // navigator.geolocation.getCurrentPosition((position) => {
+    //   let lat = position.coords.latitude;
+    //   let long = position.coords.longitude;
+    //
+    //
+    // });
   });
 
   $('.review__find-more').click(() => {
