@@ -1,10 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Place review</title>
+    <!-- Fonts -->
+    <link href="https://fonts.bunny.net/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Nunito', sans-serif;
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
-$END$
+
+<script>
+  const successCallback = (position) => {
+    console.log(position);
+    alert(JSON.stringify(position.coords));
+  };
+
+  const errorCallback = (error) => {
+    console.log(error);
+
+    alert(JSON.stringify(error));
+  };
+
+  navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+</script>
+
+<div class="page">
+
+
+    {{--    <div class="make-photo">--}}
+    {{--        <div class="make-photo__btn">--}}
+        {{--            <div class="make-photo__text">--}}
+            {{--                Фото--}}
+            {{--            </div>--}}
+        {{--        </div>--}}
+    {{--    </div>--}}
+
+    {{--    <div class="camera">--}}
+    {{--        --}}
+    {{--    </div>--}}
+
+    {{--    <div class="review">--}}
+    {{--        <div class="review__name">--}}
+        {{--            Hello world place--}}
+        {{--        </div>--}}
+    {{--        <div class="review__photo">--}}
+        {{--            <img class="review__image" src="/images/main-hall.jpg" alt="photo">--}}
+        {{--        </div>--}}
+    {{--        <div class="review__rating">--}}
+        {{--            Рейтинг: <span class="review__rating-value">5</span>--}}
+        {{--        </div>--}}
+    {{--        <div class="review__text">--}}
+        {{--            Отзыв: <span class="review__text-value">Super cool</span>--}}
+        {{--        </div>--}}
+    {{--        <div class="review__find-more">--}}
+        {{--            Найти еще--}}
+        {{--        </div>--}}
+    {{--    </div>--}}
+</div>
+
+<script>
+  // if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
+  //   console.log("Let's get this party started")
+  // }
+  //
+  // navigator.mediaDevices.getUserMedia({video: true})
+  //
+  // navigator.mediaDevices.enumerateDevices().then((r) => {
+  //   console.log(r);
+  // })
+</script>
+
+<style lang="css">
+  .make-photo__btn {
+    display: none;
+
+    width: 100px;
+    height: 100px;
+    background-color: green;
+    border-radius: 50px;
+    text-align: center;
+    margin-top: 65%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .make-photo__btn:hover, .make-photo__btn:focus {
+    opacity: .8;
+  }
+
+  .make-photo__text {
+    padding-top: 31px;
+    color: white;
+    font-size: 24px;
+  }
+
+  /* ------------------------ */
+  .review {
+    display: none;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .review__rating, .review__text {
+    font-size: 20px;
+    margin-top: 15px;
+  }
+
+  .review__name {
+    font-weight: bold;
+    font-size: 30px;
+  }
+
+  .review__image {
+    width: 100%;
+    overflow: hidden;
+    margin-top: 15px;
+  }
+
+  .review__find-more {
+    width: 150px;
+    background-color: blue;
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 35px;
+  }
+
+  .review__find-more:hover {
+    opacity: .8;
+  }
+</style>
 </body>
 </html>
