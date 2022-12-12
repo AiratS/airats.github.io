@@ -15,26 +15,289 @@
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
-<p>
-    Your location is <span id="latitude">0.00</span>° latitude by
-    <span id="longitude">0.00</span>° longitude.
-</p>
-<button id="get-location">Get My Location</button>
+<div class="display-cover">
+    <video autoplay></video>
+    <canvas class="d-none"></canvas>
+
+    <div class="video-options">
+        <select name="" id="" class="custom-select">
+            <option value="">Select camera</option>
+        </select>
+    </div>
+
+    <img class="screenshot-image d-none" alt="">
+
+    <div class="controls">
+        <button class="btn btn-danger play" title="Play"><i data-feather="play-circle"></i></button>
+        <button class="btn btn-info pause d-none" title="Pause"><i data-feather="pause"></i></button>
+        <button class="btn btn-outline-success screenshot d-none" title="ScreenShot"><i data-feather="image"></i></button>
+    </div>
+</div>
+
+<style>
+  .screenshot-image {
+    width: 150px;
+    height: 90px;
+    border-radius: 4px;
+    border: 2px solid whitesmoke;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    position: absolute;
+    bottom: 5px;
+    left: 10px;
+    background: white;
+  }
+
+  .display-cover {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70%;
+    margin: 5% auto;
+    position: relative;
+  }
+
+  video {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .video-options {
+    position: absolute;
+    left: 20px;
+    top: 30px;
+  }
+
+  .controls {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    display: flex;
+  }
+
+  .controls > button {
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    border-radius: 100%;
+    margin: 0 6px;
+    background: transparent;
+  }
+
+  .controls > button:hover svg {
+    color: white !important;
+  }
+
+  @media (min-width: 300px) and (max-width: 400px) {
+    .controls {
+      flex-direction: column;
+    }
+
+    .controls button {
+      margin: 5px 0 !important;
+    }
+  }
+
+  .controls > button > svg {
+    height: 20px;
+    width: 18px;
+    text-align: center;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  .controls button:nth-child(1) {
+    border: 2px solid #D2002E;
+  }
+
+  .controls button:nth-child(1) svg {
+    color: #D2002E;
+  }
+
+  .controls button:nth-child(2) {
+    border: 2px solid #008496;
+  }
+
+  .controls button:nth-child(2) svg {
+    color: #008496;
+  }
+
+  .controls button:nth-child(3) {
+    border: 2px solid #00B541;
+  }
+
+  .controls button:nth-child(3) svg {
+    color: #00B541;
+  }
+
+  .controls > button {
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    border-radius: 100%;
+    margin: 0 6px;
+    background: transparent;
+  }
+
+  .controls > button:hover svg {
+    color: white;
+  }
+</style>
 
 <script>
-  let button = document.getElementById("get-location");
-  let latText = document.getElementById("latitude");
-  let longText = document.getElementById("longitude");
+  feather.replace();
 
-  button.addEventListener("click", () => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      let lat = position.coords.latitude;
-      let long = position.coords.longitude;
+  const controls = document.querySelector('.controls');
+  const cameraOptions = document.querySelector('.video-options>select');
+  const video = document.querySelector('video');
+  const canvas = document.querySelector('canvas');
+  const screenshotImage = document.querySelector('img');
+  const buttons = [...controls.querySelectorAll('button')];
+  let streamStarted = false;
 
-      latText.innerText = lat;
-      longText.innerText = long;
+  const [play, pause, screenshot] = buttons;
+
+  const constraints = {
+    video: {
+      width: {
+        min: 500,
+        ideal: 500,
+        max: 500,
+      },
+      height: {
+        min: 500,
+        ideal: 500,
+        max: 500
+      },
+      facingMode: 'environment'
+    }
+  };
+
+  const getCameraSelection = async () => {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+    const options = videoDevices.map(videoDevice => {
+      return `<option value="${videoDevice.deviceId}">${videoDevice.label}</option>`;
     });
-  });
+    cameraOptions.innerHTML = options.join('');
+  };
+
+  play.onclick = () => {
+    if (streamStarted) {
+      video.play();
+      play.classList.add('d-none');
+      pause.classList.remove('d-none');
+      return;
+    }
+
+    if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
+      const updatedConstraints = {
+        ...constraints,
+        deviceId: {
+          exact: cameraOptions.value
+        }
+      };
+      startStream(updatedConstraints);
+    }
+  };
+
+  const startStream = async (constraints) => {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    handleStream(stream);
+  };
+
+  const handleStream = (stream) => {
+    video.srcObject = stream;
+    play.classList.add('d-none');
+    pause.classList.remove('d-none');
+    screenshot.classList.remove('d-none');
+    streamStarted = true;
+  };
+
+  getCameraSelection();
 </script>
+
+<div class="page">
+
+
+
+</div>
+
+<script>
+  // if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
+  //   console.log("Let's get this party started")
+  // }
+  //
+  // navigator.mediaDevices.getUserMedia({video: true})
+  //
+  // navigator.mediaDevices.enumerateDevices().then((r) => {
+  //   console.log(r);
+  // })
+</script>
+
+<style lang="css">
+  .make-photo__btn {
+    display: none;
+
+    width: 100px;
+    height: 100px;
+    background-color: green;
+    border-radius: 50px;
+    text-align: center;
+    margin-top: 65%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .make-photo__btn:hover, .make-photo__btn:focus {
+    opacity: .8;
+  }
+
+  .make-photo__text {
+    padding-top: 31px;
+    color: white;
+    font-size: 24px;
+  }
+
+  /* ------------------------ */
+  .review {
+    display: none;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .review__rating, .review__text {
+    font-size: 20px;
+    margin-top: 15px;
+  }
+
+  .review__name {
+    font-weight: bold;
+    font-size: 30px;
+  }
+
+  .review__image {
+    width: 100%;
+    overflow: hidden;
+    margin-top: 15px;
+  }
+
+  .review__find-more {
+    width: 150px;
+    background-color: blue;
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 35px;
+  }
+
+  .review__find-more:hover {
+    opacity: .8;
+  }
+</style>
 </body>
 </html>
