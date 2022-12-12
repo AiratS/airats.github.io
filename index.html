@@ -12,150 +12,69 @@
       }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
-<div class="display-cover">
-    <video autoplay></video>
-    <canvas class="d-none"></canvas>
-
-    <div class="video-options">
-        <select name="" id="" class="custom-select">
-            <option value="">Select camera</option>
-        </select>
+<div class="page">
+    <div class="make-photo">
+        <div class="make-photo__btn">
+            <div class="make-photo__text">
+                Фото
+            </div>
+        </div>
     </div>
 
-    <img class="screenshot-image d-none" alt="">
+    <div class="camera hidden">
+        <div class="camera__screen">
+            <video class="camera__video" autoplay></video>
+        </div>
+        <div class="camera__btn">
+            <div class="camera__btn-text">
+                Photo
+            </div>
+        </div>
+    </div>
 
-    <div class="controls">
-        <button class="btn btn-danger play" title="Play"><i data-feather="play-circle"></i></button>
-        <button class="btn btn-info pause d-none" title="Pause"><i data-feather="pause"></i></button>
-        <button class="btn btn-outline-success screenshot d-none" title="ScreenShot"><i data-feather="image"></i></button>
+    <div class="loading hidden">
+        Ищем...
+    </div>
+
+    <div class="not-found hidden">
+        Ничего не найдено
+
+        <div class="review__find-more">
+            Найти еще
+        </div>
+    </div>
+
+    <div class="review hidden">
+        <div class="review__name">
+            Hello world place
+        </div>
+        <div class="review__photo">
+            <img class="review__image" src="/images/main-hall.jpg" alt="photo">
+        </div>
+        <div class="review__rating">
+            Рейтинг: <span class="review__rating-value">5</span>
+        </div>
+        <div class="review__text">
+            Отзыв: <span class="review__text-value">Super cool</span>
+        </div>
+        <div class="review__find-more">
+            Найти еще
+        </div>
     </div>
 </div>
 
-<style>
-  .screenshot-image {
-    width: 150px;
-    height: 90px;
-    border-radius: 4px;
-    border: 2px solid whitesmoke;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
-    position: absolute;
-    bottom: 5px;
-    left: 10px;
-    background: white;
-  }
-
-  .display-cover {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 70%;
-    margin: 5% auto;
-    position: relative;
-  }
-
-  video {
-    width: 100%;
-    background: rgba(0, 0, 0, 0.2);
-  }
-
-  .video-options {
-    position: absolute;
-    left: 20px;
-    top: 30px;
-  }
-
-  .controls {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    display: flex;
-  }
-
-  .controls > button {
-    width: 45px;
-    height: 45px;
-    text-align: center;
-    border-radius: 100%;
-    margin: 0 6px;
-    background: transparent;
-  }
-
-  .controls > button:hover svg {
-    color: white !important;
-  }
-
-  @media (min-width: 300px) and (max-width: 400px) {
-    .controls {
-      flex-direction: column;
-    }
-
-    .controls button {
-      margin: 5px 0 !important;
-    }
-  }
-
-  .controls > button > svg {
-    height: 20px;
-    width: 18px;
-    text-align: center;
-    margin: 0 auto;
-    padding: 0;
-  }
-
-  .controls button:nth-child(1) {
-    border: 2px solid #D2002E;
-  }
-
-  .controls button:nth-child(1) svg {
-    color: #D2002E;
-  }
-
-  .controls button:nth-child(2) {
-    border: 2px solid #008496;
-  }
-
-  .controls button:nth-child(2) svg {
-    color: #008496;
-  }
-
-  .controls button:nth-child(3) {
-    border: 2px solid #00B541;
-  }
-
-  .controls button:nth-child(3) svg {
-    color: #00B541;
-  }
-
-  .controls > button {
-    width: 45px;
-    height: 45px;
-    text-align: center;
-    border-radius: 100%;
-    margin: 0 6px;
-    background: transparent;
-  }
-
-  .controls > button:hover svg {
-    color: white;
-  }
-</style>
-
 <script>
-  feather.replace();
+  const $makePhoto = $('.make-photo');
+  const $camera = $('.camera');
+  const $review = $('.review');
+  const $loading = $('.loading');
+  const $notFound = $('.not-found');
 
-  const controls = document.querySelector('.controls');
-  const cameraOptions = document.querySelector('.video-options>select');
   const video = document.querySelector('video');
   const canvas = document.querySelector('canvas');
-  const screenshotImage = document.querySelector('img');
-  const buttons = [...controls.querySelectorAll('button')];
   let streamStarted = false;
-
-  const [play, pause, screenshot] = buttons;
-
   const constraints = {
     video: {
       width: {
@@ -172,34 +91,6 @@
     }
   };
 
-  const getCameraSelection = async () => {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter(device => device.kind === 'videoinput');
-    const options = videoDevices.map(videoDevice => {
-      return `<option value="${videoDevice.deviceId}">${videoDevice.label}</option>`;
-    });
-    cameraOptions.innerHTML = options.join('');
-  };
-
-  play.onclick = () => {
-    if (streamStarted) {
-      video.play();
-      play.classList.add('d-none');
-      pause.classList.remove('d-none');
-      return;
-    }
-
-    if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
-      const updatedConstraints = {
-        ...constraints,
-        deviceId: {
-          exact: cameraOptions.value
-        }
-      };
-      startStream(updatedConstraints);
-    }
-  };
-
   const startStream = async (constraints) => {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     handleStream(stream);
@@ -207,37 +98,66 @@
 
   const handleStream = (stream) => {
     video.srcObject = stream;
-    play.classList.add('d-none');
-    pause.classList.remove('d-none');
-    screenshot.classList.remove('d-none');
     streamStarted = true;
   };
 
-  getCameraSelection();
-</script>
+  $('.make-photo__btn').click(() => {
+    $makePhoto.addClass('hidden');
+    $camera.removeClass('hidden');
 
-<div class="page">
+    if (streamStarted) {
+      video.play();
+      return;
+    }
 
+    if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
+      const updatedConstraints = {
+        ...constraints,
+      };
+      startStream(updatedConstraints);
+    }
+  });
 
+  $('.camera__btn').click(() => {
+    video.pause();
+    $camera.addClass('hidden');
+    $loading.removeClass('hidden');
 
-</div>
+    navigator.geolocation.getCurrentPosition((position) => {
+      let lat = position.coords.latitude;
+      let long = position.coords.longitude;
 
-<script>
-  // if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
-  //   console.log("Let's get this party started")
-  // }
-  //
-  // navigator.mediaDevices.getUserMedia({video: true})
-  //
-  // navigator.mediaDevices.enumerateDevices().then((r) => {
-  //   console.log(r);
-  // })
+      setTimeout(() => {
+        $.get('http://1142359-cr95104.tw1.ru/api/find-place', {
+          latitude: lat,
+          longitude: long,
+        }).done((response) => {
+          $('.review__name').text(response.name);
+          $('.review__rating-value').text(response.rating);
+          $('.review__text-value').text(response.name);
+          $('.review__image').attr('src', response.img);
+
+          $loading.addClass('hidden');
+          $review.removeClass('hidden');
+        }).fail(() => {
+          $loading.addClass('hidden');
+          $notFound.removeClass('hidden')
+        });
+      }, 2000)
+    });
+  });
+
+  $('.review__find-more').click(() => {
+    location.reload();
+  });
 </script>
 
 <style lang="css">
-  .make-photo__btn {
+  .hidden {
     display: none;
+  }
 
+  .make-photo__btn {
     width: 100px;
     height: 100px;
     background-color: green;
@@ -259,8 +179,35 @@
   }
 
   /* ------------------------ */
+
+  .camera {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .camera__video {
+    width: 100%;
+  }
+
+  .camera__btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    background-color: green;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 40px;
+  }
+
+  .camera__btn-text {
+    color: white;
+    font-size: 16px;
+    padding-top: 16px;
+  }
+
+  /* ------------------------ */
   .review {
-    display: none;
     padding-left: 15px;
     padding-right: 15px;
   }
